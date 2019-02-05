@@ -4,38 +4,34 @@
 
 import os
 import sqlite3
-from collections import OrderedDict
-# Database information
-DB_NAME = "data"
-DB_EXT = ".db"
 
 
 
-# Paths
-SOURCE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))  # \wwww\.
-DB_PATH = os.path.join(SOURCE_PATH, "db", DB_NAME+DB_EXT)
 
-#print(SOURCE_PATH)
+# Path
+DB_PATH = os.path.abspath(os.path.join('.','database.db'))
+
+#print(DB_PATH)
 
 
 class Database(object):
     def __init__(self, db_path=DB_PATH):
-
-        self.__connection = type(sqlite3.connect)
+        self.__connection = None
         self.__selected_connection = None
+        self.__table_name = ""
+        self.__field_name = ""
         self.errors = None
-        self.connect(db_path)
+        self.__connect(db_path)
 
-
-    def connect(self, db_path=DB_PATH):
+    def __connect(self, db_path=DB_PATH):
         try:
             self.__connection = sqlite3.connect(db_path)
-            self.__connection.row_factory = sqlite3.Row  # to call a row['table_name'] always before cursor()
+            self.__connection.row_factory = sqlite3.Row  # to call a row['__table_name'] always before cursor()
             self.__selected_connection = self.__connection.cursor()
-
 
         except Exception as e:
             print (e.message)
+            self.errors = e.message
             return None
 
     def is_connect(self):
@@ -44,7 +40,7 @@ class Database(object):
         else:
             return False
 
-    def execute(self, sql):
+    def __execute(self, sql):
         return self.__selected_connection.execute(sql)
 
     @staticmethod
@@ -60,7 +56,7 @@ class Database(object):
 
     @staticmethod
     def __get_to_write_sql_data(table_name, **kwargs):
-        # write("table_name", ab=1, ff=11)
+        # write("__table_name", ab=1, ff=11)
         sql = range(6)
         sql[0] = "INSERT INTO '{0}'".format(table_name)
         sql[1] = "("
@@ -78,7 +74,6 @@ class Database(object):
         sql = range(2)
         sql[0] = "SELECT * FROM "
         sql[1] = "'"+table_name+"'"
-        print " ".join(list(sql))
         return " ".join(list(sql))
 
     @staticmethod
@@ -98,50 +93,41 @@ class Database(object):
 
         return " ".join(list(sql))
 
+
     # ## Executes ##
 
     # Create
-    def create(self, table="objects", **kwargs):
-        sql_data = self.__get_to_create_sql_data(table, **kwargs)
-        self.execute(sql_data)
+    def create(self, **kwargs):
+        sql_data = self.__get_to_create_sql_data(self.__table_name, **kwargs)
+        self.__execute(sql_data)
 
     # Write to table
-    def write(self, table_name, **kwargs):
-        sql_data = self.__get_to_write_sql_data(table_name, **kwargs)
-        return self.execute(sql_data), sql_data
+    def write(self, **kwargs):
+        sql_data = self.__get_to_write_sql_data(self.__table_name, **kwargs)
+        return self.__execute(sql_data), sql_data
 
     # Delete
-    def delete(self, table_name, **kwargs):
-        sql_data = self.__get_to_delete_sql_data(table_name, **kwargs)
-        return self.execute(sql_data),sql_data
+    def delete(self, **kwargs):
+        sql_data = self.__get_to_delete_sql_data(self.__table_name, **kwargs)
+        return self.__execute(sql_data), sql_data
 
-    # Create Meta / Last sent data
-    def create_meta(self):
-        self.create("meta", modifiedDate="VARCHAR(50)", version="VARCHAR(50)")
+    def change(self, old, new):
+        sql_data = self.__get_to_update_sql_data(self.__table_name, self.__field_name, old, new)
+        return self.__execute(sql_data)
 
     def read(self):
-        if self.is_connect():
-            pass
-        else:
-            pass
-
-    def change(self,table_name,field,old,new):
-        sql_data = self.__get_to_update_sql_data(table_name,field,old,new)
-        print sql_data
-        return self.execute(sql_data)
+        sql_data = self.__get_to_read_sql_data(self.__table_name)
+        fields = self.__execute(sql_data).fetchall()
+        return fields
 
 
-    def read_all_table(self, table_name):
+    # Set Functions
+    def set_table_name(self, table_name):
+        self.__table_name = table_name
 
-        if self.is_connect():
-            sql_data = self.__get_to_read_sql_data(table_name)
-            fields = self.execute(sql_data).fetchall()
-            print fields
-            for verileri_cek in fields:
-                print verileri_cek['name']
-            return fields
-        else:
-            return None
+    def set_field_name(self, field_name):
+        self.__field_name = field_name
+
 
     def save(self):
         self.__connection.commit()
@@ -149,33 +135,19 @@ class Database(object):
     def close(self):
         self.__connection.close()
 
+if __name__ == '__main__':
+    db1 = Database()
+    db1.set_table_name("table_table")
+    db1.create(name="VARCHAR(50)", lastname="VARCHAR(50)")
+    db1.write(name="Hi",lastname="World")
+
+    db1.set_field_name("name")
+    db1.change("Hi","Hello")
+
+    #db1.delete(name="Hi")
 
 
-db1 = Database("db.db")
-#db1.create("tableVarchar",name="VARCHAR(50)",soyad="VARCHAR(50)")
-#db1.write("tableVarchar",name="merhaba",soyad="2322")
-
-
-#db1.delete("tableVarchar",name="merhaba")
-db1.read_all_table("tableVarchar")
-db1.change("tableVarchar","soyad","@","MerhabaBurasi")
-
-db1.save()
-db1.close()
-
-
-
-"""
-def setup_db():
-    db1.open()
-    db1.create_table()
+    db1.save()
+    DB = db1.read()
+    print DB[0]["name"] + " " + DB[0]["lastname"]
     db1.close()
-
-
-#db1.open()
-#db1.read_all_table("objects")
-#db1.save()
-#db1.close()
-
-"""
-
