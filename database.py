@@ -93,6 +93,17 @@ class Database(object):
         print " ".join(list(sql))
         return " ".join(list(sql))
 
+    @staticmethod
+    def __get_to_find_sql_data(table_name, **kwargs):
+        find_sql_data = " ".join(key+"="+"'"+str(value)+"'" for key, value in kwargs.items())
+        sql = range(3)
+        sql[0] = "SELECT * ".format()
+        sql[1] = "FROM {table}".format(table=table_name)
+        sql[2] = "WHERE {find} ".format(find=find_sql_data)
+        print " ".join(list(sql))
+        return " ".join(list(sql))
+
+
 
     # ## Executes ##
 
@@ -116,8 +127,19 @@ class Database(object):
         #print sql_data
         return self.__execute(sql_data)
 
-    def read(self):
-        sql_data = self.__get_to_read_sql_data(self.__table_name)
+    def read(self,table_name=""):
+        if table_name == "":
+            sql_data = self.__get_to_read_sql_data(self.__table_name)
+        else:
+            sql_data = self.__get_to_read_sql_data(table_name)
+        fields = self.__execute(sql_data).fetchall()
+        return fields
+
+    def find(self, table_name="", **kwargs):
+        if table_name == "":
+            sql_data = self.__get_to_find_sql_data(self.__table_name, **kwargs)
+        else:
+            sql_data = self.__get_to_find_sql_data(table_name, **kwargs)
         fields = self.__execute(sql_data).fetchall()
         return fields
 
@@ -139,7 +161,9 @@ class Database(object):
 
 if __name__ == '__main__':
     db1 = Database()
-    db1.set_table_name("table_table")
+    db1.set_table_name("words")
+    print db1.find(status="process")
+    """
     db1.create(name="VARCHAR(50)", lastname="VARCHAR(50)")
     db1.write(name="Hi",lastname="World")
 
@@ -153,3 +177,4 @@ if __name__ == '__main__':
     DB = db1.read()
     print DB[0]["name"] + " " + DB[0]["lastname"]
     db1.close()
+    """
