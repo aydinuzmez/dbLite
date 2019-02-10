@@ -108,13 +108,19 @@ class Database(object):
     # ## Executes ##
 
     # Create
-    def create(self, **kwargs):
-        sql_data = self.__get_to_create_sql_data(self.__table_name, **kwargs)
+    def create(self, table_name="", **kwargs):
+        if table_name == "":
+            sql_data = self.__get_to_create_sql_data(self.__table_name, **kwargs)
+        else:
+            sql_data = self.__get_to_create_sql_data(table_name, **kwargs)
         self.__execute(sql_data)
 
     # Write to table
-    def write(self, **kwargs):
-        sql_data = self.__get_to_write_sql_data(self.__table_name, **kwargs)
+    def write(self, table_name="", **kwargs):
+        if table_name == "":
+            sql_data = self.__get_to_write_sql_data(self.__table_name, **kwargs)
+        else:
+            sql_data = self.__get_to_write_sql_data(table_name, **kwargs)
         return self.__execute(sql_data), sql_data
 
     # Delete
