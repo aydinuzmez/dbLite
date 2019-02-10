@@ -85,12 +85,12 @@ class Database(object):
         return " ".join(list(sql))
 
     @staticmethod
-    def __get_to_update_sql_data(table_name, field_name, old, new):
+    def __get_to_update_sql_data(table_name, set, where):
         sql = range(3)
         sql[0] = "UPDATE {table}".format(table=table_name)
-        sql[1] = "SET {field}='{_new}'".format(field=field_name, _new=new)
-        sql[2] = "WHERE {field}='{_old}'".format(field=field_name, _old=old)
-
+        sql[1] = "SET {set}".format(set=set)
+        sql[2] = "WHERE {where}".format(where=where)
+        print " ".join(list(sql))
         return " ".join(list(sql))
 
 
@@ -111,8 +111,9 @@ class Database(object):
         sql_data = self.__get_to_delete_sql_data(self.__table_name, **kwargs)
         return self.__execute(sql_data), sql_data
 
-    def change(self, old, new):
-        sql_data = self.__get_to_update_sql_data(self.__table_name, self.__field_name, old, new)
+    def change(self, _set,_where):
+        sql_data = self.__get_to_update_sql_data(self.__table_name, _set, _where)
+        #print sql_data
         return self.__execute(sql_data)
 
     def read(self):
