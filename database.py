@@ -120,6 +120,8 @@ class Database(object):
         fields = self.__execute(sql_data).fetchall()
         return fields
 
+    def last_row_id(self):
+        return self.__selected_connection.lastrowid
 
     # Set Functions
     def set_table_name(self, table_name):
@@ -127,7 +129,6 @@ class Database(object):
 
     def set_field_name(self, field_name):
         self.__field_name = field_name
-
 
     def save(self):
         self.__connection.commit()
