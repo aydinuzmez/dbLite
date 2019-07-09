@@ -149,8 +149,12 @@ class Database(object):
         sql_data = self.__get_to_delete_sql_data(self.__table_name, **kwargs)
         return self.__execute(sql_data), sql_data
 
-    def change(self, _set,_where):
-        sql_data = self.__get_to_update_sql_data(self.__table_name, _set, _where)
+    def change(self, table_name="", set="",where=""):
+        if table_name is "":
+            sql_data = self.__get_to_update_sql_data(self.__table_name, set, where)
+        else:
+            sql_data = self.__get_to_update_sql_data(table_name, set, where)
+
         #print sql_data
         return self.__execute(sql_data)
 
