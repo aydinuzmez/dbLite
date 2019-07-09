@@ -101,12 +101,27 @@ class Database(object):
 
     @staticmethod
     def __get_to_find_sql_data(table_name, **kwargs):
-        find_sql_data = " ".join(key+"="+"'"+str(value)+"'" for key, value in kwargs.items())
+        find_sql_data = ""
+        limit = None
+        offset = None
+        for key, value in kwargs.items():
+            if key.lower() == "limit":
+                limit = "'{value}'".format(key=key,value=value)
+            elif key.lower() == "offset":
+                offset = "'{value}'".format(key=key,value=value)
+            else:
+                find_sql_data = "{key}= '{value}'".format(key=key,value=value)
+
+        #print find_sql_data
         sql = range(3)
         sql[0] = "SELECT * ".format()
-        sql[1] = "FROM {table}".format(table=table_name)
-        sql[2] = "WHERE {find} ".format(find=find_sql_data)
-        print " ".join(list(sql))
+        sql[1] = r"FROM {table}".format(table=table_name)
+        sql[2] = r"WHERE {find} ".format(find=find_sql_data)
+        if limit is not None:
+            sql.append("LIMIT {0}".format(limit))
+        if offset is not None:
+            sql.append("OFFSET {0}".format(offset))
+        #print " ".join(list(sql))
         return " ".join(list(sql))
 
 
