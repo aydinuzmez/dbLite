@@ -158,11 +158,11 @@ class Database(object):
         #print sql_data
         return self.__execute(sql_data)
 
-    def read(self,table_name=""):
+    def read(self,table_name="",limit="",offset=""):
         if table_name == "":
-            sql_data = self.__get_to_read_sql_data(self.__table_name)
+            sql_data = self.__get_to_read_sql_data(self.__table_name, limit, offset)
         else:
-            sql_data = self.__get_to_read_sql_data(table_name)
+            sql_data = self.__get_to_read_sql_data(table_name, limit, offset)
         fields = self.__execute(sql_data).fetchall()
         return fields
 
