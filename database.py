@@ -63,7 +63,7 @@ class Database(object):
         sql[2] = " ".join(_key + "," for _key, _value in kwargs.items())
         sql[2] = str(sql[2]).rstrip(",")
         sql[3] = ")" + " VALUES" + "("
-        sql[4] = " ".join("'"+str(_value)+"'" + "," for _key, _value in kwargs.items())
+        sql[4] = " ".join("'"+_value.encode("utf-8")+"'" + "," for _key, _value in kwargs.items())
         sql[4] = str(sql[4]).rstrip(",")  # deleted ,
         sql[5] = ")"
         sql = " ".join(list(sql))
