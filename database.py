@@ -70,7 +70,8 @@ class Database(object):
         return sql
 
     @staticmethod
-    def __get_to_read_sql_data(table_name):
+    def __get_to_read_sql_data(table_name="",limit="",offset=""):
+
         sql = range(2)
         sql[0] = "SELECT * FROM "
         sql[1] = "'"+table_name+"'"
