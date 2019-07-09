@@ -142,12 +142,19 @@ class Database(object):
         return fields
 
     def find(self, table_name="", **kwargs):
+        """
+
+        :rtype: object
+        """
         if table_name == "":
             sql_data = self.__get_to_find_sql_data(self.__table_name, **kwargs)
         else:
             sql_data = self.__get_to_find_sql_data(table_name, **kwargs)
         fields = self.__execute(sql_data).fetchall()
         return fields
+
+    def count(self, table_name):
+        return len(self.read(table_name))
 
     def last_row_id(self):
         return self.__selected_connection.lastrowid
