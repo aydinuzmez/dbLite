@@ -75,6 +75,11 @@ class Database(object):
         sql = range(2)
         sql[0] = "SELECT * FROM "
         sql[1] = "'"+table_name+"'"
+        if limit != "":
+            sql.append("LIMIT {0}".format(limit))
+        if offset != "":
+            sql.append("OFFSET {0}".format(offset))
+
         return " ".join(list(sql))
 
     @staticmethod
